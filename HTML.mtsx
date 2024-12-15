@@ -1,0 +1,55 @@
+{
+    name: ["HTML", ".html", ".htm"]
+    ignoreCase: true
+    comment: {startsWith: "<!--", endsWith: "-->"}
+    defines: [
+        "startTagContains": [
+            {match: /(?s)<!--.*?(-->|$)/, 0: "comment"}
+            {match: /(xmlns:)([^='"\s]+)/, 1: "attrName", 2: "namespace"}
+            {match: /(?:([^='"<\/>\s]+)(:))?([^='"<\/>\s]+)/, 1: "namespace", 2: "attrName", 3: "attrName"}
+            {
+                group: link
+                contains: [
+                    {match: /=\s*/, 0: "string"}
+                    {match: /(?s)(["']).*?\1/, 0: "string"}
+                ]
+            }
+        ]
+    ]
+    contains: [
+        {
+            start:  {
+                start: {match: /<\s*(script)\b/, 1: "tagName"}
+                end: {match: ">|$"}
+                contains: [ {include: "startTagContains"} ]
+            }
+            end: {match: "</\\s*(script)\\s*>", 1: "tagName"}
+        }
+        {
+            start:  {
+                start: {match: /<\s*(style)\b/, 1: "tagName"}
+                end: {match: ">|$"}
+                contains: [ {include: "startTagContains"} ]
+            }
+            end: {match: "</\\s*(style)\\s*>", 1: "tagName"}
+        }
+        {
+            start:  {
+                start: {match: /<\s*(pre)\b/, 1: "tagName"}
+                end: {match: ">|$"}
+                contains: [ {include: "startTagContains"} ]
+            }
+            end: {match: "</\\s*(pre)\\s*>", 1: "tagName"}
+        }
+        {
+            start: {match: "<\\??([^/>\\s]+)", 1: "tagName"}
+            end: {match: "[?/]?>|$"}
+            contains: [ {include: "startTagContains"} ]
+        }
+        {
+            match: "</\\s*([^>\\s]+)\\s*>", 1: "tagName"
+        }
+    ]
+    codeFormatter: #BUILT_IN_HTML_FORMATTER#
+    codeShrinker: #BUILT_IN_HTML_SHRINKER#
+}
